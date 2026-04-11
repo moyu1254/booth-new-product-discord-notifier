@@ -1,0 +1,6 @@
+{
+  "discord_webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE",
+  "booth_tags": ["ひかるん対応"],
+  "check_interval_minutes": 30,
+  "booth_search_url": "https://booth.pm/ja/search"
+}
