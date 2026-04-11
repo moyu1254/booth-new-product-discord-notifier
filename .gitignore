@@ -206,6 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# プロジェクト固有の設定
-config.json
-seen_products.json
+# デバッグファイル
+booth_page.html
+
+# ローカル実行用（機密情報を含む可能性がある）
+config.local.json
