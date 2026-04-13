@@ -31,7 +31,7 @@ Boothの特定のタグの新商品をDiscordに通知するツール
 ## 必要環境
 
 - Python 3.11+
-- Google Chrome（GitHub Actions では自動インストール）
+- Google Chrome（GitHub Actions では自動インストール / ※ソフトウェア版も同様）
 
 ## ローカルでの実行
 
