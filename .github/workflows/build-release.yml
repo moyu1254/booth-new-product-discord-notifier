@@ -33,10 +33,11 @@ jobs:
 
       - name: Create distribution zip
         run: |
-          echo '[]' | Out-File -FilePath seen_products.json -Encoding utf8
+          echo '[]' | Out-File -FilePath seen_products.json -Encoding utf8NoBOM
           Compress-Archive -Path dist/booth-notifier.exe, config.example.json, seen_products.json, README.md -DestinationPath booth-notifier-windows.zip
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: booth-notifier-windows.zip
