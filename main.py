@@ -8,12 +8,19 @@ import urllib.parse
 def load_config():
     """設定ファイル (config.json) を読み込む"""
     config_file = 'config.json'
+    example_file = 'config.example.json'
     
-    # config.jsonが存在しない場合はエラーメッセージを表示
+    # config.jsonが存在しない場合
     if not os.path.exists(config_file):
-        print("❌ エラー: config.json が見つかりません")
-        print("📝 config.example.json をコピーして config.json を作成してください")
-        return None
+        # config.example.jsonからコピーを試みる
+        if os.path.exists(example_file):
+            import shutil
+            shutil.copy(example_file, config_file)
+            print("📝 config.json が見つからなかったため、config.example.json からコピーしました")
+            print("⚠️  config.json を編集して設定を行ってください")
+        else:
+            print("❌ エラー: config.json も config.example.json も見つかりません")
+            return None
     
     # JSONファイルを開いて読み込む
     with open(config_file, 'r', encoding='utf-8') as f:
