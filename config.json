@@ -1,5 +1,5 @@
 {
   "discord_webhook_url": "YOUR_DISCORD_WEBHOOK_URL_HERE",
-  "booth_tags": ["ひかるん対応"],
+  "booth_tags": ["監視したいタグ名"],
   "check_interval_minutes": 30
 }
