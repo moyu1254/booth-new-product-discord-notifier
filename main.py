@@ -26,7 +26,8 @@ def load_seen_products():
         return set()
     try:
         with open(path, 'r', encoding='utf-8') as f:
-            return set(json.load(f))
+            data = json.load(f)
+            return set(data) if isinstance(data, list) else set()
     except Exception:
         return set()
 
@@ -47,6 +48,7 @@ def parse_product_card(card):
     """
     商品カード(li要素など)からタイトル、価格、URL、画像URLを抽出
     """
+    # タイトルとリンクの取得
     link_elem = card.find('a', href=True, class_=re.compile(r'item-card__title|pc--item-card__title'))
     if not link_elem:
         link_elem = card.find('a', href=True)
@@ -73,7 +75,10 @@ def parse_product_card(card):
     img_elem = card.find('img')
     image_url = ""
     if img_elem:
-        image_url = img_elem.get('src') or img_elem.get('data-src') or ""
+        # Lazy load対策でdata-srcなども確認
+        image_url = img_elem.get('src') or img_elem.get('data-src') or img_elem.get('data-original') or ""
+        if image_url.startswith('//'):
+            image_url = 'https:' + image_url
 
     return {
         'id': product_id,
@@ -85,6 +90,7 @@ def parse_product_card(card):
 
 def fetch_products_by_tag(session, tag):
     encoded_tag = urllib.parse.quote(tag)
+    # 成人向けを含む設定をURLパラメータで付与
     url = f'https://booth.pm/ja/items?adult=include&tags%5B%5D={encoded_tag}&sort=new'
     
     headers = {
@@ -96,7 +102,7 @@ def fetch_products_by_tag(session, tag):
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, 'html.parser')
         
-        # BOOTHの商品カードは通常 <li> 形式。クラス名は時期により変動するため柔軟に取得
+        # 商品カードを抽出
         cards = soup.find_all(['li', 'div'], class_=re.compile(r'item-card'))
         
         products = []
@@ -116,8 +122,8 @@ def send_discord(webhook_url, product, tag):
         'url': product['url'],
         'color': 0xFF6FAE,
         'fields': [
-            {'name': '価格', 'value': product['price'], 'inline': True},
-            {'name': 'タグ', 'value': tag, 'inline': True},
+            {'name': '価格', 'value': product['price'][:1024], 'inline': True},
+            {'name': 'タグ', 'value': tag[:1024], 'inline': True},
         ],
         'footer': {'text': 'BOOTH Monitor'}
     }
@@ -138,6 +144,10 @@ def main():
         return
 
     webhook_url = config['discord_webhook_url']
+    if webhook_url == 'YOUR_DISCORD_WEBHOOK_URL_HERE':
+        print("Please set your Discord Webhook URL in config.json or environment variable.")
+        return
+
     seen_ids = load_seen_products()
     new_seen_count = 0
 
@@ -146,14 +156,15 @@ def main():
             print(f"Checking tag: {tag}")
             products = fetch_products_by_tag(session, tag)
             
+            # 見つかった商品のうち、未通知のもののみ処理
             for p in products:
                 if p['id'] not in seen_ids:
                     if send_discord(webhook_url, p, tag):
                         seen_ids.add(p['id'])
                         new_seen_count += 1
-                        time.sleep(1) # Discord制限回避
+                        time.sleep(1) # Discordのレートリミット回避
             
-            time.sleep(2) # サイト負荷軽減
+            time.sleep(2) # BOOTHサーバーへの負荷軽減
 
     if new_seen_count > 0:
         save_seen_products(seen_ids)
