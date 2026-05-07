@@ -54,3 +54,4 @@ pip install -r requirements.txt
 cp config.example.json config.json
 # config.json を編集してから実行
 python main.py
+```
