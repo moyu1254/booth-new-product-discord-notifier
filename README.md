@@ -13,7 +13,7 @@ Boothの特定のタグの新商品をDiscordに通知するツール
    - `discord_webhook_url`: DiscordのWebhook URLを設定する
 4. `booth-notifier.exe` をダブルクリックして起動する
 
-> ⚠️ 実行には **Google Chrome** がインストールされている必要があります
+> 💡 今回のアップデートにより、**Google Chromeのインストールは不要**になりました。
 
 ### ☁️ GitHub Actions 版（自動定期実行）
 
@@ -45,7 +45,7 @@ Boothの特定のタグの新商品をDiscordに通知するツール
 ## 必要環境
 
 - Python 3.11+
-- Google Chrome（GitHub Actions では自動インストール / ※ソフトウェア版も同様）
+- (ブラウザのインストールは不要です)
 
 ## ローカルでの実行
 
@@ -54,4 +54,3 @@ pip install -r requirements.txt
 cp config.example.json config.json
 # config.json を編集してから実行
 python main.py
-```
